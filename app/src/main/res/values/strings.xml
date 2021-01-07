@@ -1,0 +1,25 @@
+<resources>
+
+    <string name="sortbydistance">Sort by Distance</string>
+    <string name="sortbydate">Sort by Date</string>
+    <string name="newrun">Start Exercise</string>
+    <string name="viewrun">View Records</string>
+    <string name="statusrunning">Status: Recording</string>
+    <string name="statusnot">Status: Recorder Inactive</string>
+    <string name="app_name">RunTracker</string>
+    <string name="lastrun">Last Session:</string>
+    <string name="one">1</string>
+    <string name="two">2</string>
+    <string name="three">3</string>
+    <string name="four">4</string>
+    <string name="five">5</string>
+    <string name="closebtn">Close</string>
+    <string name="yourrun">Your Run</string>
+    <string name="weather">"Weather: "</string>
+    <string name="notes">"Notes: "</string>
+    <string name="rating">"Rating: "</string>
+    <string name="channel_name">TrackingService</string>
+    <string name="zerotime">00:00:00</string>
+    <string name="currentrun">Current Run</string>
+    <string name="zerodis">0 km</string>
+</resources>
