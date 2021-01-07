@@ -40,8 +40,8 @@ import com.google.android.gms.maps.model.PolylineOptions;
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback{
 
     List<String> list;
-    private boolean isBound;
-    private boolean isRunning = false;
+    //private boolean isBound;
+    //private boolean isRunning = false;
     Button startrun;
     TrackingService runService;
 
@@ -51,10 +51,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
+        /*
         this.startService(new Intent(this, TrackingService.class));
         this.bindService(new Intent(this, TrackingService.class), serviceConnection, Context.BIND_AUTO_CREATE);
-
+        */
         Log.d("CW2", "MAIN ONCREATE called");
 
         //gets instances of mainactivity textviews so that they can be edited
@@ -84,10 +84,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         //if the app is launched from being closed from the notification onNewintent is called to restore modified UI elements
         Log.d("CW2", "MAIN ONNEWINTENT called @onCREATE");
-        onNewIntent(getIntent());
+
+        //onNewIntent(getIntent());
     }
 
-
+    /*
     //If the app is started from notification, the intent used will be checked for a string that indicates whether the service is running or not
     //If the service is running, the start exercise button is updated accordingly
     @Override
@@ -107,6 +108,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
         super.onNewIntent(intent);
     }
+
+     */
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
@@ -136,7 +139,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     //method called by the record exercise button to call the start run method in the service
     //if a run is being recorded, the button changes to a stop run button and can call the stop run method in the service
     public void onNewRun(View view) throws ParseException {
-        if(isRunning)
+        Intent intent = new Intent(this, CurrentRun.class);
+        startActivity(intent);
+        /*if(isRunning)
         {
             runService.stoprun();
             startrun.setText("START EXERCISE");
@@ -146,8 +151,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             startrun.setText("STOP EXERCISE");
             isRunning=true;
         }
+         */
     }
 
+    /*
     //create a service connection
     private ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
@@ -165,19 +172,25 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     };
 
+     */
+
     @Override
     protected void onResume() {
         super.onResume();
+        /*
         //rebinds to service when the activity is resumed
         Intent createService = new Intent(MainActivity.this, TrackingService.class);
         bindService(createService, serviceConnection, Context.BIND_AUTO_CREATE);
         Log.d("CW2", "MAIN BIND SERVICE called @ONRESUME");
+
+         */
     }
 
     @Override
     public void onDestroy()
     {
         super.onDestroy();
+        /*
         //unbinds service if run is being recorded to that service can continue to run
         if(isRunning&&isBound&&serviceConnection!=null)
         {
@@ -189,6 +202,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             stopService(new Intent(this, TrackingService.class));
         }
         Log.d("CW2", "MAIN ONDESTORY called");
+
+         */
     }
 
 

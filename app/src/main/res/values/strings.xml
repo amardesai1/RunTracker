@@ -22,4 +22,5 @@
     <string name="zerotime">00:00:00</string>
     <string name="currentrun">Current Run</string>
     <string name="zerodis">0 km</string>
+    <string name="gotomain">Home</string>
 </resources>

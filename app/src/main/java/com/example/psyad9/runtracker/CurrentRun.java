@@ -37,6 +37,9 @@ public class CurrentRun extends AppCompatActivity  implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.current_run);
 
+        this.startService(new Intent(this, TrackingService.class));
+        this.bindService(new Intent(this, TrackingService.class), serviceConnection, Context.BIND_AUTO_CREATE);
+
         startrun = findViewById(R.id.startbutton);
         String coords = "";
         list = Arrays.asList(coords.split(","));
@@ -46,7 +49,7 @@ public class CurrentRun extends AppCompatActivity  implements OnMapReadyCallback
             mapFragment.getMapAsync(this);
 
         //if the app is launched from being closed from the notification onNewintent is called to restore modified UI elements
-            Log.d("CW2", "MAIN ONNEWINTENT called @onCREATE");
+            Log.d("CW2", "CURRENT RUN ONNEWINTENT called @onCREATE");
         onNewIntent(getIntent());
     }
 
@@ -54,7 +57,7 @@ public class CurrentRun extends AppCompatActivity  implements OnMapReadyCallback
     //If the service is running, the start exercise button is updated accordingly
     @Override
     public void onNewIntent(Intent intent) {
-        Log.d("CW2", "MAIN ONNEWINTENT called");
+        Log.d("CW2", "CURRENT RUN ONNEWINTENT called");
 
         try {
             Bundle extras = intent.getExtras();
@@ -103,19 +106,26 @@ public class CurrentRun extends AppCompatActivity  implements OnMapReadyCallback
         }
     }
 
+    //method called by the home button to return to main
+    //This useful as if the user returned to the activity using the notification after closing the app, the activity stack will be empty
+    public void onHome(View view) throws ParseException {
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
+    }
+
     //create a service connection
     private ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder s) {
             runService = ((TrackingService.TrackingBinder)s).getService();
             isBound = true;
-            Log.d("CW2", "MAIN ONSERVICECONNECTED called");
+            Log.d("CW2", "CURRENT RUN ONSERVICECONNECTED called");
         }
 
         @Override
         public void onServiceDisconnected(ComponentName componentName) {
             runService = null;
-            Log.d("CW2", "MAIN ONSERVICEDISCONNECTED called");
+            Log.d("CW2", "CURRENT RUN ONSERVICEDISCONNECTED called");
 
         }
     };
@@ -126,7 +136,7 @@ public class CurrentRun extends AppCompatActivity  implements OnMapReadyCallback
         //rebinds to service when the activity is resumed
         Intent createService = new Intent(CurrentRun.this, TrackingService.class);
         bindService(createService, serviceConnection, Context.BIND_AUTO_CREATE);
-        Log.d("CW2", "MAIN BIND SERVICE called @ONRESUME");
+        Log.d("CW2", "CURRENT RUN BIND SERVICE called @ONRESUME");
     }
 
     @Override
@@ -138,12 +148,12 @@ public class CurrentRun extends AppCompatActivity  implements OnMapReadyCallback
         {
             unbindService(serviceConnection);
             isBound = false;
-            Log.d("CW2", "MAIN UNBIND SERVICE called @ONDESTROY");
+            Log.d("CW2", "CURRENT RUN UNBIND SERVICE called @ONDESTROY");
         }else{
             //if run isnt being recorded, end service when activity is ended
             stopService(new Intent(this, TrackingService.class));
         }
-        Log.d("CW2", "MAIN ONDESTORY called");
+        Log.d("CW2", "CURRENT RUN ONDESTORY called");
     }
 
 }

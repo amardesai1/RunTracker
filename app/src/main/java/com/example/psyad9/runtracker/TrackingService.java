@@ -155,7 +155,7 @@ public class TrackingService extends Service {
     //method that builds and starts a new notification with content, priority, icon and a pending intent that will return the user to the main class
     public void buildnot()
     {
-        Intent intent = new Intent(this, MainActivity.class);
+        Intent intent = new Intent(this, CurrentRun.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         intent.setAction(Intent.ACTION_MAIN);
         intent.addCategory(Intent.CATEGORY_LAUNCHER);
