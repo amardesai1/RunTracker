@@ -14,7 +14,6 @@ public class Contract {
     public static final String DATABASE_DATE = "date";
     public static final String DATABASE_START_TIME = "time";
     public static final String DATABASE_LENGTH = "length";
-    //public static final String STEPS = "steps";
     public static final String DATABASE_COORDS = "coords";
     public static final String DATABASE_DISTANCE = "distance";
     public static final String DATABASE_WEATHER = "weather";

@@ -57,7 +57,6 @@ public class ViewRun extends AppCompatActivity implements OnMapReadyCallback {
         notesedit = findViewById(R.id.editText2);
         ratingview = findViewById(R.id.ratinggroup);
 
-        //
         try {
             //Finds row cursor in database corresponding to the run clicked on in the runlist
             //Retrieves data from all other fields in row
@@ -136,7 +135,6 @@ public class ViewRun extends AppCompatActivity implements OnMapReadyCallback {
         googleMap.addPolyline(p);
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom((new LatLng(Double.parseDouble(list.get(0)), Double.parseDouble(list.get(1)))), 12));
     }
-
 
     public void onClickDone(View view)
     {

@@ -17,24 +17,40 @@ import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
 
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
+import java.util.Scanner;
 
 import static com.example.psyad9.runtracker.Contract.*;
 
-public class TrackingService extends Service {
+public class TrackingService extends Service{
 
     public static final String CHANNEL_ID = "channel_id";
-
     private String time;
+    private int id;
+    private String lat;
+    private String lon;
+    private String timewithseconds;
+    private boolean running = false;
+
     private LocationManager locationManager;
-    private MyLocationListener locationListener;
+    public MyLocationListener locationListener;
+
     Notification notification;
     NotificationManager notificationManager;
     public Binder TrackingBinder = new TrackingBinder();
-    private boolean running = false;
 
     //Allows activity to access public methods in service
     public class TrackingBinder extends Binder
@@ -90,6 +106,7 @@ public class TrackingService extends Service {
     {
         running = true;
         time = new SimpleDateFormat("HH:mm", Locale.getDefault()).format(new Date());
+        timewithseconds = new SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(new Date());
 
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         locationListener = new MyLocationListener();
@@ -97,6 +114,7 @@ public class TrackingService extends Service {
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5, 10, locationListener); // request location updates from location listener
         } catch (SecurityException e) {
         }
+
         createchannel();
         buildnot();
 
@@ -109,6 +127,12 @@ public class TrackingService extends Service {
         running = false;
         stopForeground(true);
 
+        @SuppressLint("DefaultLocale") String coords = locationListener.returnCoords();
+        System.out.println(coords);
+        List<String> list = Arrays.asList(coords.split(","));
+        lat = list.get(0);
+        lon = list.get(1);
+        getWeather();
         String date = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(new Date());
         String starttime = time;
         time = new SimpleDateFormat("HH:mm", Locale.getDefault()).format(new Date());
@@ -116,7 +140,6 @@ public class TrackingService extends Service {
         Date date1 = format.parse(starttime);
         Date date2 = format.parse(time);
         String length = Long.toString((date2.getTime() - date1.getTime())/60000);
-        @SuppressLint("DefaultLocale") String coords = locationListener.returnCoords();
         @SuppressLint("DefaultLocale") String stringdistance = String.format("%.2f", locationListener.returnDistanceTotal());
 
         insertvalues(date, starttime, length, coords, stringdistance);
@@ -132,11 +155,11 @@ public class TrackingService extends Service {
         RunValues.put(DATABASE_LENGTH, length);
         RunValues.put(DATABASE_COORDS, coords);
         RunValues.put(DATABASE_DISTANCE, distance);
-        RunValues.put(DATABASE_WEATHER, "");
+        RunValues.put(DATABASE_WEATHER, " ");
         RunValues.put(DATABASE_NOTES, "");
         RunValues.put(DATABASE_RATING, 0);
 
-        getContentResolver().insert(RECORDS_URI, RunValues);
+        id = (int) Long.parseLong(getContentResolver().insert(RECORDS_URI, RunValues).getLastPathSegment());
         Log.d("CW2", "SERVICE INSERVALUES called");
     }
 
@@ -159,10 +182,12 @@ public class TrackingService extends Service {
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         intent.setAction(Intent.ACTION_MAIN);
         intent.addCategory(Intent.CATEGORY_LAUNCHER);
-        if(running)
+        if(running) {
             intent.putExtra("running", "true");
-        else
+        }
+        else {
             intent.putExtra("running", "false");
+        }
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent,PendingIntent.FLAG_UPDATE_CURRENT);
 
         notification = new NotificationCompat.Builder(this, CHANNEL_ID)
@@ -174,5 +199,88 @@ public class TrackingService extends Service {
                 .build();
         startForeground(100,notification);
     }
+
+    //
+    public String returncoords(){
+        return locationListener.returnCoords();
+
+    }
+
+    //
+    public double returndistance()
+    {
+        return locationListener.returnDistanceTotal();
+    }
+
+    //
+    public int returnseconds(){
+        String starttime = timewithseconds;
+        System.out.println("STARTTIME: "+starttime);
+        String currenttime = new SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(new Date());
+        System.out.println("CURRENTTIME: "+currenttime);
+        @SuppressLint("SimpleDateFormat") SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss");
+        Date date1 = null;
+        Date date2 = null;
+        try {
+            date1 = format.parse(starttime);
+            date2 = format.parse(currenttime);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        int seconds = (int)((date2.getTime() - date1.getTime())/1000);
+        return seconds;
+    }
+
+    //Method that creates a thread that retrieves weather data from the openweather api and inserts it into the database in the last added record
+    public void getWeather() {
+        
+        Thread thread = new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                try  {
+                    try {
+                        String s = "https://api.openweathermap.org/data/2.5/weather?lat="+lat+"&lon="+lon+"&appid=3cbc6ada2dc436d4ff5281070c3776eb&units=metric";
+                        URL url = new URL(s);
+                        HttpURLConnection conn = (HttpURLConnection)url.openConnection();
+                        conn.setRequestMethod("GET");
+                        conn.connect();
+                        int responsecode = conn.getResponseCode();
+                        if(responsecode!=200)
+                            throw new RuntimeException("HTTPResponseCode: "+responsecode);
+                        else
+                        {
+                            Scanner sc = new Scanner(url.openStream());
+                            String inline = null;
+                            while(sc.hasNext())
+                                inline += sc.nextLine();
+                            sc.close();
+                            inline = inline.substring(4);
+                            JSONObject jObject = new JSONObject(inline);
+
+                            String temp = Double.toString(jObject.getJSONObject("main").getDouble("temp"));
+                            JSONArray jArray = jObject.getJSONArray("weather");
+                            String main = jArray.getJSONObject(0).get("main").toString();
+                            String descripton = jArray.getJSONObject(0).get("description").toString();
+                            String weather = "Temp: "+temp+"° - Weather is "+main+" - "+descripton;
+                            ContentValues weatherval = new ContentValues();
+                            weatherval.put(DATABASE_WEATHER, weather);
+                            getContentResolver().update(RECORDS_URI,weatherval,DATABASE_ID+"="+id,null);
+
+                        }
+
+
+                    } catch (IOException | JSONException e) {
+                        e.printStackTrace();
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        thread.start();
+    }
+
+
 
 }

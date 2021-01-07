@@ -53,10 +53,9 @@ class MyLocationListener implements LocationListener {
         return coords;
     }
 
-    //returns distance in
+    //returns distance in kilometers
     public double returnDistanceTotal(){
-        total = total/1000;
-        return total;
+        return total/1000;
     }
 
 

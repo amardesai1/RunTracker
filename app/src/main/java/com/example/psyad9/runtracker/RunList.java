@@ -36,7 +36,7 @@ public class RunList extends AppCompatActivity {
     //list loading method which makes a cursor which can access the content provider to get a list of runs and display in the listview using an adapter in a defined order
     public void loadlist(View view, String s) {
         ListView lv = findViewById(R.id.runslist);
-        String[] projection = new String[] {DATABASE_RUN_NAME, DATABASE_ID, DATABASE_DATE, DATABASE_START_TIME, DATABASE_LENGTH,DATABASE_COORDS, DATABASE_DISTANCE, DATABASE_WEATHER, DATABASE_NOTES, DATABASE_RATING};
+        String[] projection = new String[] {DATABASE_RUN_NAME, DATABASE_ID};
         String colsToDisplay [] = new String[] {DATABASE_RUN_NAME};
         int[] colResIds = new int[] {R.id.value1,};
         final Cursor cursor = getContentResolver().query(RECORDS_URI, projection, null, null, s);

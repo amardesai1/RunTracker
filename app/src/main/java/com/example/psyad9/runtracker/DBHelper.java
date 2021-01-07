@@ -16,7 +16,6 @@ public class DBHelper extends SQLiteOpenHelper {
     private static final String SQL_CREATE_TABLE = "CREATE TABLE records " +
             "(_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,name VARCHAR(128) NOT NULL,date VARCHAR(128) NOT NULL," +
             "time VARCHAR(128) NOT NULL, length VARCHAR(128) NOT NULL, coords VARCHAR(128) NOT NULL," +
-            //"steps IMTEGER,"+
             "distance VARCHAR(128) NOT NULL,weather VARCHAR(128) NOT NULL,notes VARCHAR(128) NOT NULL," +
             "rating INTEGER);";
 
